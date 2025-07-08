@@ -94,7 +94,7 @@
   </div>
 
   <div id="footer">
-    Powered by PulseChain math 🧠 | Not financial advice | Data from CoinGecko
+    Powered by PulseChain math 🧠 | Not financial advice | Data from CoinGecko (via proxy)
   </div>
 
   <script>
@@ -115,22 +115,21 @@
 
     async function fetchCirculatingSupply() {
       try {
-        const res = await fetch('https://api.coingecko.com/api/v3/coins/pulsechain');
+        const res = await fetch('https://corsproxy.io/?https://api.coingecko.com/api/v3/coins/pulsechain');
         const data = await res.json();
         const supply = data?.market_data?.circulating_supply;
 
-        if (supply && typeof supply === 'number') {
+        if (typeof supply === 'number' && supply > 0) {
           circulatingSupply = supply;
           document.getElementById("supplyDisplay").textContent = formatNumber(supply);
-          update();
         } else {
-          throw new Error("Invalid supply");
+          throw new Error("Invalid supply returned from API");
         }
       } catch (err) {
         console.warn("Failed to fetch supply, using default.", err);
         document.getElementById("supplyDisplay").textContent = formatNumber(circulatingSupply) + " (fallback)";
-        update();
       }
+      update();
     }
 
     function update() {
