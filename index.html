@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PLS Bag Value Estimator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #00ffff;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    input[type="number"],
+    input[type="range"] {
+      width: 100%;
+      margin: 10px 0 20px;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    .output {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+
+    .label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    #footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>PLS Bag Value Estimator</h1>
+  <div class="container">
+    <label class="label" for="plsAmount">Enter your PLS bag size:</label>
+    <input type="number" id="plsAmount" placeholder="e.g. 1000000" value="1000000" />
+
+    <label class="label" for="marketcapSlider">Select Marketcap ($100M → $1T):</label>
+    <input type="range" id="marketcapSlider" min="100000000" max="1000000000000" step="1000000" value="100000000">
+
+    <div class="output">Marketcap: <span id="marketcapDisplay">$100,000,000</span></div>
+    <div class="output">Estimated PLS Price: <span id="plsPriceDisplay">$0.00074</span></div>
+    <div class="output">Your Bag Value: <span id="bagValueDisplay">$740.74</span></div>
+  </div>
+
+  <div id="footer">
+    Powered by PulseChain dreams 🌐 | Not financial advice
+  </div>
+
+  <script>
+    const totalSupply = 135_000_000_000; // Update this if needed
+    const plsInput = document.getElementById("plsAmount");
+    const slider = document.getElementById("marketcapSlider");
+    const marketcapDisplay = document.getElementById("marketcapDisplay");
+    const bagValueDisplay = document.getElementById("bagValueDisplay");
+    const plsPriceDisplay = document.getElementById("plsPriceDisplay");
+
+    function update() {
+      const marketcap = parseFloat(slider.value);
+      const plsAmount = parseFloat(plsInput.value) || 0;
+      const plsPrice = marketcap / totalSupply;
+      const bagValue = plsPrice * plsAmount;
+
+      marketcapDisplay.textContent = `$${marketcap.toLocaleString()}`;
+      plsPriceDisplay.textContent = `$${plsPrice.toFixed(6)}`;
+      bagValueDisplay.textContent = `$${bagValue.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`;
+    }
+
+    plsInput.addEventListener("input", update);
+    slider.addEventListener("input", update);
+
+    update();
+  </script>
+</body>
+</html>
