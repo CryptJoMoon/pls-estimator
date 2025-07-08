@@ -88,14 +88,15 @@
   </div>
 
   <div id="footer">
-    Powered by PulseChain math 🧠 | Not financial advice | Supply pulled from on-chain balances
+    Powered by PulseChain math 🧠 | Not financial advice | Supply pulled from WPLS contract + on-chain burns
   </div>
 
   <script>
     let circulatingSupply = 0;
     const deadAddress = "0x000000000000000000000000000000000000dEaD";
     const originAddress = "0x0000000000000000000000000000000000000369";
-    const totalSupply = 7090858815607; // known PulseChain total supply in PLS (not wei)
+    const wplsAddress = "0xA1077a294dDE1B09bB078844df40758a5D0f9a27";
+    const erc20Abi = [{ "constant": true, "inputs": [], "name": "totalSupply", "outputs": [{ "name": "", "type": "uint256" }], "type": "function" }];
 
     function parseNumber(input) {
       return parseFloat(input.replace(/,/g, '')) || 0;
@@ -113,17 +114,21 @@
     async function fetchCirculatingSupply() {
       try {
         const web3 = new Web3("https://rpc.pulsechain.com");
+        const contract = new web3.eth.Contract(erc20Abi, wplsAddress);
+
+        const totalSupplyRaw = await contract.methods.totalSupply().call();
+        const totalSupplyPLS = parseFloat(web3.utils.fromWei(totalSupplyRaw));
 
         const balanceDead = await web3.eth.getBalance(deadAddress);
         const balance369 = await web3.eth.getBalance(originAddress);
+        const burnedPLS = parseFloat(web3.utils.fromWei(
+          web3.utils.toBN(balanceDead).add(web3.utils.toBN(balance369))
+        ));
 
-        const burned = web3.utils.toBN(balanceDead).add(web3.utils.toBN(balance369));
-        const burnedPLS = parseFloat(web3.utils.fromWei(burned));
-
-        circulatingSupply = totalSupply - burnedPLS;
+        circulatingSupply = totalSupplyPLS - burnedPLS;
         document.getElementById("supplyDisplay").textContent = formatNumber(circulatingSupply);
       } catch (err) {
-        console.warn("Failed to fetch burn balances. Aborting.", err);
+        console.warn("Failed to fetch supply or balances.", err);
         document.getElementById("supplyDisplay").textContent = "Error";
         circulatingSupply = 1;
       }
