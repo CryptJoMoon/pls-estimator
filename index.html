@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PLS Bag Value Estimator</title>
+  <link rel="icon" href="data:,"> <!-- prevent 404 favicon -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -117,6 +118,7 @@
       try {
         const res = await fetch('https://corsproxy.io/?https://api.coingecko.com/api/v3/coins/pulsechain');
         const data = await res.json();
+        console.log("Full CoinGecko response:", data); // DEBUG
         const supply = data?.market_data?.circulating_supply;
 
         if (typeof supply === 'number' && supply > 0) {
