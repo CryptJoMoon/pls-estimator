@@ -72,10 +72,14 @@
       border-radius: 12px;
       max-width: 480px;
     }
-    #promo img {
+    #promo a img {
       width: 100px;
       border-radius: 50%;
       margin-bottom: 10px;
+      transition: transform 0.3s ease;
+    }
+    #promo a img:hover {
+      transform: scale(1.1) rotate(2deg);
     }
     #promo h2 {
       margin: 0;
@@ -84,8 +88,13 @@
     }
     #promo a {
       color: #00ffff;
-      display: block;
+      display: inline-block;
       margin-top: 5px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    #promo a:hover {
+      color: #ff66cc;
     }
   </style>
 </head>
@@ -113,7 +122,9 @@
   </div>
 
   <div id="promo">
-    <img src="Simp_PLS.png" alt="SIMP logo" />
+    <a href="https://simponpulse.com/" target="_blank">
+      <img src="/00_pulse.png" alt="SIMP logo" />
+    </a>
     <h2>Powered by SIMP on Pulse 🔥</h2>
     <a href="https://simponpulse.com/" target="_blank">🌐 simponpulse.com</a>
     <a href="https://t.me/SIMPonPLS" target="_blank">💬 Telegram</a>
