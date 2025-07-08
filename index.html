@@ -95,6 +95,7 @@
     let circulatingSupply = 0;
     const deadAddress = "0x000000000000000000000000000000000000dEaD";
     const originAddress = "0x0000000000000000000000000000000000000369";
+    const totalSupply = 7090858815607; // known PulseChain total supply in PLS (not wei)
 
     function parseNumber(input) {
       return parseFloat(input.replace(/,/g, '')) || 0;
@@ -116,17 +117,13 @@
         const balanceDead = await web3.eth.getBalance(deadAddress);
         const balance369 = await web3.eth.getBalance(originAddress);
 
-        const latestBlock = await web3.eth.getBlock("latest");
-        const totalSupplyWei = web3.utils.toBN(latestBlock.totalDifficulty); // Use totalDifficulty as a proxy for total issuance (hacky workaround)
-
         const burned = web3.utils.toBN(balanceDead).add(web3.utils.toBN(balance369));
-        const circ = totalSupplyWei.sub(burned);
-        const circFormatted = web3.utils.fromWei(circ);
+        const burnedPLS = parseFloat(web3.utils.fromWei(burned));
 
-        circulatingSupply = parseFloat(circFormatted);
+        circulatingSupply = totalSupply - burnedPLS;
         document.getElementById("supplyDisplay").textContent = formatNumber(circulatingSupply);
       } catch (err) {
-        console.warn("Failed to fetch total supply from chain. Aborting.", err);
+        console.warn("Failed to fetch burn balances. Aborting.", err);
         document.getElementById("supplyDisplay").textContent = "Error";
         circulatingSupply = 1;
       }
