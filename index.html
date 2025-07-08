@@ -88,17 +88,17 @@
       <button onclick="setMarketcap(1_000_000_000_000)">$1T</button>
     </div>
 
-    <div class="output">Circulating Supply (PLS): <span id="supplyDisplay">135,000,000,000</span></div>
-    <div class="output">Estimated PLS Price: <span id="plsPriceDisplay">$0.00074</span></div>
-    <div class="output">Your Bag Value: <span id="bagValueDisplay">$740.74</span></div>
+    <div class="output">Circulating Supply (PLS): <span id="supplyDisplay">Loading...</span> <button onclick="fetchCirculatingSupply()">↻</button></div>
+    <div class="output">Estimated PLS Price: <span id="plsPriceDisplay">$0.00000</span></div>
+    <div class="output">Your Bag Value: <span id="bagValueDisplay">$0.00</span></div>
   </div>
 
   <div id="footer">
-    Powered by PulseChain math 🧠 | Not financial advice
+    Powered by PulseChain math 🧠 | Not financial advice | Data from CoinGecko
   </div>
 
   <script>
-    const circulatingSupply = 135_000_000_000;
+    let circulatingSupply = 135_000_000_000; // Default fallback
 
     function parseNumber(input) {
       return parseFloat(input.replace(/,/g, '')) || 0;
@@ -111,6 +111,26 @@
     function setMarketcap(val) {
       document.getElementById("marketcap").value = formatNumber(val);
       update();
+    }
+
+    async function fetchCirculatingSupply() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/coins/pulsechain');
+        const data = await res.json();
+        const supply = data?.market_data?.circulating_supply;
+
+        if (supply && typeof supply === 'number') {
+          circulatingSupply = supply;
+          document.getElementById("supplyDisplay").textContent = formatNumber(supply);
+          update();
+        } else {
+          throw new Error("Invalid supply");
+        }
+      } catch (err) {
+        console.warn("Failed to fetch supply, using default.", err);
+        document.getElementById("supplyDisplay").textContent = formatNumber(circulatingSupply) + " (fallback)";
+        update();
+      }
     }
 
     function update() {
@@ -131,7 +151,7 @@
     document.getElementById("plsAmount").addEventListener("input", update);
     document.getElementById("marketcap").addEventListener("input", update);
 
-    update();
+    fetchCirculatingSupply();
   </script>
 </body>
 </html>
