@@ -80,6 +80,7 @@
       <button onclick="setMarketcap(10_000_000_000)">$10B</button>
       <button onclick="setMarketcap(100_000_000_000)">$100B</button>
       <button onclick="setMarketcap(1_000_000_000_000)">$1T</button>
+      <button onclick="setCurrentMarketcap()">🔍 Set to Current MC</button>
     </div>
 
     <div class="output">Circulating Supply (PLS): <span id="supplyDisplay">Loading...</span> <button onclick="fetchCirculatingSupply()">↻</button></div>
@@ -108,6 +109,14 @@
 
     function setMarketcap(val) {
       document.getElementById("marketcap").value = formatNumber(val);
+      update();
+    }
+
+    async function setCurrentMarketcap() {
+      if (circulatingSupply <= 0) return;
+      const price = parseNumber(document.getElementById("plsPriceDisplay").textContent.replace(/[^0-9.]/g, ''));
+      const marketcap = price * circulatingSupply;
+      document.getElementById("marketcap").value = formatNumber(marketcap);
       update();
     }
 
