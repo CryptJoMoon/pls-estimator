@@ -62,6 +62,30 @@
       margin-top: 40px;
       font-size: 14px;
       color: #888;
+      text-align: center;
+    }
+    #promo {
+      margin-top: 50px;
+      text-align: center;
+      background: #111;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 480px;
+    }
+    #promo img {
+      width: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+    #promo h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #ff66cc;
+    }
+    #promo a {
+      color: #00ffff;
+      display: block;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -86,6 +110,14 @@
     <div class="output">Circulating Supply (PLS): <span id="supplyDisplay">Loading...</span> <button onclick="fetchCirculatingSupply()">↻</button></div>
     <div class="output">Estimated PLS Price: <span id="plsPriceDisplay">$0.00000</span></div>
     <div class="output">Your Bag Value: <span id="bagValueDisplay">$0.00</span></div>
+  </div>
+
+  <div id="promo">
+    <img src="00_pulse.png" alt="SIMP logo" />
+    <h2>Powered by SIMP on Pulse 🔥</h2>
+    <a href="https://simponpulse.com/" target="_blank">🌐 simponpulse.com</a>
+    <a href="https://t.me/SIMPonPLS" target="_blank">💬 Telegram</a>
+    <a href="https://x.com/SIMPonPulse" target="_blank">🐦 Twitter / X</a>
   </div>
 
   <div id="footer">
