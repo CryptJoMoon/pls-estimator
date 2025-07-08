@@ -114,10 +114,16 @@
 
     async function setCurrentMarketcap() {
       if (circulatingSupply <= 0) return;
-      const price = parseNumber(document.getElementById("plsPriceDisplay").textContent.replace(/[^0-9.]/g, ''));
-      const marketcap = price * circulatingSupply;
-      document.getElementById("marketcap").value = formatNumber(marketcap);
-      update();
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=pulsechain&vs_currencies=usd");
+        const data = await res.json();
+        const price = data.pulsechain.usd;
+        const marketcap = price * circulatingSupply;
+        document.getElementById("marketcap").value = formatNumber(marketcap);
+        update();
+      } catch (err) {
+        console.warn("Failed to fetch current price:", err);
+      }
     }
 
     async function fetchCirculatingSupply() {
