@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PLS Bag Value Estimator</title>
-  <link rel="icon" href="data:,"> <!-- prevent 404 favicon -->
+  <link rel="icon" href="data:,">
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,11 +16,9 @@
       align-items: center;
       padding: 40px;
     }
-
     h1 {
       color: #00ffff;
     }
-
     .container {
       max-width: 500px;
       width: 100%;
@@ -28,7 +27,6 @@
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
     }
-
     input[type="number"],
     input[type="text"] {
       width: 100%;
@@ -39,17 +37,14 @@
       border-radius: 8px;
       box-sizing: border-box;
     }
-
     .output {
       font-size: 18px;
       margin: 10px 0;
     }
-
     .label {
       margin-bottom: 5px;
       font-weight: bold;
     }
-
     .preset-buttons button {
       margin: 5px;
       padding: 10px 15px;
@@ -60,11 +55,9 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
     .preset-buttons button:hover {
       background-color: #0056b3;
     }
-
     #footer {
       margin-top: 40px;
       font-size: 14px;
@@ -95,11 +88,13 @@
   </div>
 
   <div id="footer">
-    Powered by PulseChain math 🧠 | Not financial advice | Data from CoinGecko (via proxy)
+    Powered by PulseChain math 🧠 | Not financial advice | Supply pulled from on-chain balances
   </div>
 
   <script>
-    let circulatingSupply = 135_000_000_000; // Default fallback
+    let circulatingSupply = 0;
+    const deadAddress = "0x000000000000000000000000000000000000dEaD";
+    const originAddress = "0x0000000000000000000000000000000000000369";
 
     function parseNumber(input) {
       return parseFloat(input.replace(/,/g, '')) || 0;
@@ -116,20 +111,24 @@
 
     async function fetchCirculatingSupply() {
       try {
-        const res = await fetch('https://corsproxy.io/?https://api.coingecko.com/api/v3/coins/pulsechain');
-        const data = await res.json();
-        console.log("Full CoinGecko response:", data); // DEBUG
-        const supply = data?.market_data?.circulating_supply;
+        const web3 = new Web3("https://rpc.pulsechain.com");
 
-        if (typeof supply === 'number' && supply > 0) {
-          circulatingSupply = supply;
-          document.getElementById("supplyDisplay").textContent = formatNumber(supply);
-        } else {
-          throw new Error("Invalid supply returned from API");
-        }
+        const balanceDead = await web3.eth.getBalance(deadAddress);
+        const balance369 = await web3.eth.getBalance(originAddress);
+
+        const latestBlock = await web3.eth.getBlock("latest");
+        const totalSupplyWei = web3.utils.toBN(latestBlock.totalDifficulty); // Use totalDifficulty as a proxy for total issuance (hacky workaround)
+
+        const burned = web3.utils.toBN(balanceDead).add(web3.utils.toBN(balance369));
+        const circ = totalSupplyWei.sub(burned);
+        const circFormatted = web3.utils.fromWei(circ);
+
+        circulatingSupply = parseFloat(circFormatted);
+        document.getElementById("supplyDisplay").textContent = formatNumber(circulatingSupply);
       } catch (err) {
-        console.warn("Failed to fetch supply, using default.", err);
-        document.getElementById("supplyDisplay").textContent = formatNumber(circulatingSupply) + " (fallback)";
+        console.warn("Failed to fetch total supply from chain. Aborting.", err);
+        document.getElementById("supplyDisplay").textContent = "Error";
+        circulatingSupply = 1;
       }
       update();
     }
